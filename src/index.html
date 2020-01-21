@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <title>OBS BasketBall Scoreboard</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+  <h2 class="text-center">Cal Poly OBS Scoreboard:</h2>
+  <div class="row">
+    <div class="col-sm">
+      <h4 id="team1">Team 1:</h4>
+      <div class="row m-2 top15">
+        <input id='team1-input' class="form-control" type="text">
+      </div>
+      <div class="row m-2">
+        <button class="btn btn-secondary" onclick="changeName(1)">Change Name</button>
+      </div>
+      <div class="row top30">
+        <div class="col-sm">
+          <p>Score:</p>
+        </div>
+        <div class="col-sm">
+          <input type="number" class="form-control-file" id="team1-score" value="0" min="0">
+        </div>
+        <div class="col-sm">
+          <button class="btn btn-secondary" onclick="overideScore(1)">Overide</button>
+        </div>
+      </div>
+      <div class="row top30">
+        <div class="col-sm">
+          <button class="btn btn-primary" onclick="addpts(1,1)">1 pts</button>
+        </div>
+        <div class="col-sm">
+          <button class="btn btn-primary" onclick="addpts(1,2)">2 pts</button>
+        </div>
+        <div class="col-sm">
+          <button class="btn btn-primary" onclick="addpts(1,3)">3 pts</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm">
+      <h4 id="team2">Team 2:</h4>
+      <div class="row m-2 top15">
+        <input id='team2-input' class="form-control" type="text">
+      </div>
+      <div class="row m-2">
+        <button class="btn btn-secondary" onclick="changeName(2)">Change Name</button>
+      </div>
+      <div class="row top30">
+        <div class="col-sm">
+          <p>Score:</p>
+        </div>
+        <div class="col-sm">
+          <input type="number" class="form-control-file x-6" id="team2-score" value="0" min="0">
+        </div>
+        <div class="col-sm">
+          <button class="btn btn-secondary" onclick="overideScore(2)">Overide</button>
+        </div>
+      </div>
+      <div class="row top30">
+        <div class="col-sm">
+          <button class="btn btn-primary" onclick="addpts(2,1)">1 pts</button>
+        </div>
+        <div class="col-sm">
+          <button class="btn btn-primary" onclick="addpts(2,2)">2 pts</button>
+        </div>
+        <div class="col-sm">
+          <button class="btn btn-primary" onclick="addpts(2,3)">3 pts</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const fs = require('fs')
+    const { ipcRenderer } = require('electron');
+    const path = require('path')
+
+    //global desired filepath
+
+    let filePath
+    // init
+    document.addEventListener("DOMContentLoaded", function (event) {
+      getFilePath()
+      ipcRenderer.on('folderData', (event, data) => {
+        if (data) {
+          filePath = data
+          fs.writeFileSync(path.join(filePath, 'team1_Name.txt'), 'Team1')
+          fs.writeFileSync(path.join(filePath, 'team2_Name.txt'), 'Team2')
+          fs.writeFileSync(path.join(filePath, 'team1_Score.txt'), '0')
+          fs.writeFileSync(path.join(filePath, 'team2_Score.txt'), '0')
+        } else {
+          getFilePath()
+        }
+      })
+    });
+
+    let teams = {
+      1: 0,
+      2: 0
+    }
+
+    function getFilePath() {
+      ipcRenderer.send('openFolder', () => { });
+    }
+
+    function addpts(teamNum, pts) {
+      let scoreInput = document.getElementById(`team${teamNum}-score`)
+      teams[teamNum] += parseInt(pts)
+      scoreInput.value = teams[teamNum]
+      fs.writeFile(path.join(filePath, `team${teamNum}_Score.txt`), `${teams[teamNum]}`, () => { })
+    }
+
+    function changeName(teamNum) {
+      let teamName = document.getElementById(`team${teamNum}-input`).value
+      if (teamName) {
+        document.getElementById(`team${teamNum}`).innerHTML = `${teamName}:`
+        fs.writeFile(path.join(filePath, `./team${teamNum}_Name.txt`), teamName, () => { })
+      }
+    }
+
+    function overideScore(teamNum) {
+      let scoreInput = document.getElementById(`team${teamNum}-score`)
+      teams[teamNum] = parseInt(scoreInput.value)
+      scoreInput.value = teams[teamNum]
+      fs.writeFile(path.join(filePath, `./team${teamNum}_Score.txt`), `${teams[teamNum]}`, () => { })
+    }
+
+  </script>
+</body>
+
+</html>
