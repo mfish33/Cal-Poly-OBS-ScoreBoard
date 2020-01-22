@@ -109,7 +109,7 @@ fs.readdir(path.join(__dirname,'configs')).then(configs => {
       role: 'help',
       submenu: [
         {
-          label: 'Learn More',
+          label: 'Github',
           click: async () => {
             const { shell } = require('electron')
             await shell.openExternal('https://github.com/mfish33/Cal-Poly-OBS-ScoreBoard')
