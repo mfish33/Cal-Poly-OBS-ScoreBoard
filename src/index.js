@@ -94,7 +94,7 @@ fs.readdir(path.join(__dirname,'configs')).then(configs => {
   }).filter(configs => Object.keys(configs) != 0)
 
   if(parsedConfigs.length == 0) {
-    //throw new Error('No acceptable Configs')
+    throw new Error('No acceptable Configs')
   }
 
   //Create Menu
