@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs-extra');
+var log = require('electron-log');
+Object.assign(console, log.functions); //redirect to log file
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -75,7 +77,7 @@ const ChangeConfig = (config) => {
 
 
 //load config
-fs.readdir('./src/configs').then(configs => {
+fs.readdir(path.join(__dirname,'configs')).then(configs => {
   let parsedConfigs = configs.filter(config => config.match(/.json/)).map(config => {
     let temp;
     try{
@@ -92,12 +94,10 @@ fs.readdir('./src/configs').then(configs => {
   }).filter(configs => Object.keys(configs) != 0)
 
   if(parsedConfigs.length == 0) {
-    throw new Error('No acceptable Configs')
+    //throw new Error('No acceptable Configs')
   }
-  
 
   //Create Menu
-  const isMac = process.platform === 'darwin'
   const template = [
     // { role: 'Config Menu' }
     {
