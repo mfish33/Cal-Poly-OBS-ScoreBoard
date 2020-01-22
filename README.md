@@ -5,6 +5,4 @@
 3. npm run publish
 
 ## Editing:
-* You can change point values by modifying buttons in index.html
-* For each button you add make sure to add a column div in order to get the correct spacing
-* You can change the application heading on the HTML tittle
+* You can add sports by adding config files in the conig folder. Follow the structure in the existing files.
